@@ -26,7 +26,7 @@ class MyBitVector:
 
         currentOffset = 0
         for i in range(numSuperBlocks):
-            superBlocks[i] = SuperBlock(vec[(i * log2sq): ((i + 1) * log2sq - 1)], currentOffset, log2hf)
+            superBlocks[i] = SuperBlock(vec[(i * log2sq): ((i + 1) * log2sq)], currentOffset, log2hf)
             currentOffset = superBlocks[i].offset
 
         return superBlocks
@@ -41,7 +41,7 @@ class SuperBlock:
 
         currentOffset = 0
         for i in range(numBlocks):
-            blocks[i] = Block(vec[(i * blockLen): ((i + 1) * blockLen - 1)], currentOffset)
+            blocks[i] = Block(vec[(i * blockLen): ((i + 1) * blockLen)], currentOffset)
             currentOffset = blocks[i].offset
 
         self.offset = prevOffset + currentOffset
