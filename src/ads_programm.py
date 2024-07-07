@@ -6,8 +6,6 @@ import MyBitVector
 
 start_time = time.time()
 
-# todo accept parameters
-
 inputFile = "input.txt"
 outputFile = "output.txt"
 
