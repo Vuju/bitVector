@@ -10,7 +10,6 @@ class MyBitVector:
         log2hf = int(log2 / 2)
         self.rank = self._calculate_rank_super_block(self.vector, log2sq, log2hf)
 
-
     def access(self, index):
         return self.vector[index]
 
@@ -30,7 +29,6 @@ class MyBitVector:
             currentOffset = superBlocks[i].offset
 
         return superBlocks
-
 
 
 class SuperBlock:
@@ -56,7 +54,3 @@ class Block:
                 currentOffest += 1
             # todo: update lookup table
         self.offset = prevOffset + currentOffest
-
-
-
-

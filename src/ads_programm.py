@@ -3,8 +3,8 @@
 import time
 import sys
 import MyBitVector
-start_time = time.time()
 
+start_time = time.time()
 
 # todo accept parameters
 
@@ -21,13 +21,16 @@ with open(inputFile) as f:
     cmdCount = int(f.readline())
     bitVectorString = f.readline()
 
-    MyBitVector
+    bitVector = MyBitVector(bitVectorString)
+    options = {
+        "rank": bitVector.rank,
+        "select": bitVector.select,
+        "access": bitVector.access
+    }
 
     for line in f:
-        cmd = line.strip().split(" ")
-        print(cmd)
-        # todo switch over possible commands
-        time.sleep(1)
+        cmd = line.strip().split(" ", 1)  # this only splits the command from the arguments,
+        options[cmd[0]](cmd[1])           # therefore this line passes all arguments as a single string!
 
 print("RESULT name=julian_vu time={0} space={1}".format(int((time.time() - start_time) / 1000), "dunno"))
 # optional todo: implement any amount of error handling
