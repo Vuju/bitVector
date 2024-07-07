@@ -2,7 +2,7 @@
 
 import time
 import sys
-import MyBitVector
+from MyBitVector import MyBitVector
 
 start_time = time.time()
 
@@ -20,15 +20,16 @@ with open(inputFile) as f:
     bitVectorString = f.readline()
 
     bitVector = MyBitVector(bitVectorString)
-    options = {
+
+    ops = {
         "rank": bitVector.rank,
         "select": bitVector.select,
         "access": bitVector.access
     }
 
     for line in f:
-        cmd = line.strip().split(" ", 1)  # this only splits the command from the arguments,
-        options[cmd[0]](cmd[1])           # therefore this line passes all arguments as a single string!
+        comm = line.strip().split(" ", 1)  # this only splits the command from the arguments,
+        print(ops[comm[0]](comm[1]))       # therefore this line passes all arguments as a single string!
 
 print("RESULT name=julian_vu time={0} space={1}".format(int((time.time() - start_time) / 1000), "dunno"))
 

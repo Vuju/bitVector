@@ -13,32 +13,34 @@ class MyBitVector:
         log2 = (self.len.bit_length() - 1)
         self.log2sq = log2 ** 2
         self.log2hf = int(log2 / 2)
-        self.rank = self._calculate_rank_super_block(self.vector, self.log2sq, self.log2hf)
+        self.rankVector = self._calculate_rank_super_block(self.vector, self.log2sq, self.log2hf)
         # todo: create select structure?
 
     def access(self, index):
-        return self.vector[index]
+        return self.vector[int(index)]
 
     def rank(self, args):
-        [b, index] = args
-        rankOf1 = self.rank()[int(index / self.log2sq)].get_rank(index % self.log2sq)
+        [b, index] = [int(n) for n in args.split(" ")]
+        rankOf1 = self.rankVector[int(index / self.log2sq)].get_rank(index % self.log2sq)
         if b == 1:
             return rankOf1
         else:
             return index-rankOf1
 
     def select(self, args):
-        [b, index] = args
+        [b, index] = args.split(" ")
         # todo: implement
 
     def _calculate_rank_super_block(self, vec, log2sq, log2hf):
         numSuperBlocks = int(len(vec) / log2sq) + 1  # todo: optimize if no rounding happens
         superBlocks = [None] * numSuperBlocks
+        # print("Number and lenght of SB is: " + str(numSuperBlocks) + " and " + str(log2sq))
 
         currentOffset = 0
         for i in range(numSuperBlocks):
             superBlocks[i] = SuperBlock(vec[(i * log2sq): ((i + 1) * log2sq)], currentOffset, log2hf)
             currentOffset = superBlocks[i].offset
+            # print("Offset of SB " + str(i) + " is " + str(currentOffset))
 
         return superBlocks
 
@@ -55,6 +57,7 @@ class SuperBlock:
         for i in range(numBlocks):
             self.blocks[i] = Block(vec[(i * blockLen): ((i + 1) * blockLen)], currentOffset)
             currentOffset = self.blocks[i].offset
+            # print("Offset of Block " + str(i) + " is " + str(currentOffset))
         self.offset = prevOffset + currentOffset
 
     def get_rank(self, index):
@@ -67,8 +70,8 @@ class Block:
     def __init__(self, vec, prevOffset):
         currentOffest = 0
         self.lookup = [None] * len(vec)
-        for i in vec:
-            if i == 1:
+        for i in range(len(vec)):
+            if vec[i] == '1':
                 currentOffest += 1
             self.lookup[i] = currentOffest
         self.prevOffset = prevOffset
@@ -77,3 +80,4 @@ class Block:
     def get_rank(self, index):
         return self.prevOffset + self.lookup[index]
 
+    # todo create lookup storage to remove duplicates
