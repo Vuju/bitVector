@@ -1,5 +1,8 @@
 # parser script to interpret input file
+
 import time
+import sys
+import MyBitVector
 start_time = time.time()
 
 
@@ -8,11 +11,17 @@ start_time = time.time()
 inputFile = "input.txt"
 outputFile = "output.txt"
 
+try:
+    inputFile = sys.argv[1]
+    outputFile = sys.argv[2]
+except IndexError:
+    pass
+
 with open(inputFile) as f:
     cmdCount = int(f.readline())
     bitVectorString = f.readline()
 
-    # todo init bitVector
+    MyBitVector
 
     for line in f:
         cmd = line.strip().split(" ")
