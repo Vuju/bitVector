@@ -9,15 +9,18 @@ class MyBitVector:
         log2sq = log2 ** 2
         log2hf = int(log2 / 2)
         self.rank = self._calculate_rank_super_block(self.vector, log2sq, log2hf)
+        # todo: create select structure?
 
     def access(self, index):
         return self.vector[index]
 
-    def rank(self):
-        pass
+    def rank(self, args):
+        [b, index] = args
+        # todo: implement
 
-    def select(self):
-        pass
+    def select(self, args):
+        [b, index] = args
+        # todo: implement
 
     def _calculate_rank_super_block(self, vec, log2sq, log2hf):
         numSuperBlocks = int(len(vec) / log2sq) + 1  # todo: optimize if no rounding happens
