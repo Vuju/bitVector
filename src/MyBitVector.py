@@ -1,20 +1,22 @@
 # Class file implementing an advanced bit-vector as explained in the lecture
 
+
 class MyBitVector:
     """A bit vector which implements (somewhat) efficient rank and select operations.
 
         Attributes:
             vectorAsString: A string of 0 and 1 to read a text file.
         """
+
     def __init__(self, vectorAsString):
         self.len = len(vectorAsString)
         self.vector = [char for char in vectorAsString]
 
-        log2 = (self.len.bit_length() - 1)
-        self.log2sq = log2 ** 2
-        self.log2hf = int(log2 / 2)
+        self.log2 = (self.len.bit_length() - 1)
+        self.log2sq = self.log2 ** 2
+        self.log2hf = int(self.log2 / 2)
         self.rankVector = self._calculate_rank_super_block(self.vector, self.log2sq, self.log2hf)
-        # todo: create select structure?
+        self.selectStructure = _calculate_select_structure(self.vector, self.log2)
 
     def access(self, index):
         return self.vector[int(index)]
@@ -25,24 +27,34 @@ class MyBitVector:
         if b == 1:
             return rankOf1
         else:
-            return index-rankOf1
+            return index - rankOf1
 
     def select(self, args):
         [b, index] = args.split(" ")
         # todo: implement
 
-    def _calculate_rank_super_block(self, vec, log2sq, log2hf):
-        numSuperBlocks = int(len(vec) / log2sq) + 1  # todo: optimize if no rounding happens
-        superBlocks = [None] * numSuperBlocks
-        # print("Number and lenght of SB is: " + str(numSuperBlocks) + " and " + str(log2sq))
 
-        currentOffset = 0
-        for i in range(numSuperBlocks):
-            superBlocks[i] = SuperBlock(vec[(i * log2sq): ((i + 1) * log2sq)], currentOffset, log2hf)
-            currentOffset = superBlocks[i].offset
-            # print("Offset of SB " + str(i) + " is " + str(currentOffset))
+def _calculate_rank_super_block(vec, log2sq, log2hf):
+    numSuperBlocks = int(len(vec) / log2sq) + 1  # todo: optimize if no rounding happens
+    superBlocks = [None] * numSuperBlocks
+    # print("Number and lenght of SB is: " + str(numSuperBlocks) + " and " + str(log2sq))
 
-        return superBlocks
+    currentOffset = 0
+    for i in range(numSuperBlocks):
+        superBlocks[i] = SuperBlock(vec[(i * log2sq): ((i + 1) * log2sq)], currentOffset, log2hf)
+        currentOffset = superBlocks[i].offset
+        # print("Offset of SB " + str(i) + " is " + str(currentOffset))
+
+    return superBlocks
+
+
+def _calculate_select_structure(vector, log2):
+    # todo calculate chunks and their offsets
+    # todo calculate sparse lookup table
+    # todo for each dense chunk: calculate subchunk offsets
+        # todo calculate lookup for each sparse sub-chunk
+        # todo calculate ?lookup mapping? for dense sub-chunks
+    pass
 
 
 class SuperBlock:
