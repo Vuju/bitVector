@@ -39,22 +39,40 @@ class MyBitVector:
             return index - rankOf1
 
     def select(self, args):
-        [bitChar, element] = args.split(" ")
+        [bitChar, elementString] = args.split(" ")
+        
+        print("lets go:")
         b = int(bitChar)
+        element = int(elementString)        
+        print(self.chunkOffsets[b])
+        
         chunkId = int(element / self.log2sq)
+        print(chunkId)
+        
         if (self.chunkOffsets[b][chunkId + 1] - self.chunkOffsets[b][chunkId]) > (self.log2 ** 4):
+            print("Sparse!")
             return self.sparseLookup[b][element]
         else: 
+            print("Dense")
             offset = self.chunkOffsets[b][chunkId]
             subChunks = self.subChunkOffsets[b][offset]
-            remainder = element - (chunkId * self.log2sq)
-            subChunkId = remainder / (self.log2 ** (1/2))
+            print(self.subChunkOffsets[b])
+            remainder = (element - 1) % self.log2sq            
+            subChunkId = int(remainder / int(self.log2 ** (1/2)))
+            print(str(subChunkId) + " = " + str(remainder) + " / " + str(self.log2 ** (1/2)))
             relativeOffset = subChunks[subChunkId]
             if (subChunks[subChunkId + 1] - relativeOffset) > self.log2hf:
+                print("-> Sparse!")
+                print(self.denseSparseLookup[b])
                 return self.denseSparseLookup[b][element]
             else:
+                print("-> Dense!")
+                print(self.denseDenseLookup[b])
+                print("Offset: " + str(offset) + ", relOff: " + str(relativeOffset))
                 key = self.vector[offset + relativeOffset : offset + subChunks[subChunkId + 1]]
-                return (offset + relativeOffset + self.denseDenseLookup[b][str(key)])
+                subSubIndex = (remainder % int(self.log2 ** (1/2)))
+                print(str(key) + ": " + str(subSubIndex))
+                return (offset + relativeOffset + self.denseDenseLookup[b][str(key)][subSubIndex])
 
 
 def _calculate_rank_super_block(vec, log2sq, log2hf):
@@ -114,7 +132,7 @@ def _calculate_select_structure(vector, log2, b):
                     if counter > subChunkWeight:
                         relativeOffsets.append(i2 - chunkOffsets[i])
                         counter = 1
-            relativeOffsets.append(chunkOffsets[i+1])
+            relativeOffsets.append(chunkOffsets[i+1]- chunkOffsets[i])
             subChunkOffsets[chunkOffsets[i]] = relativeOffsets
             
     denseSparseLookup = {}
@@ -126,14 +144,21 @@ def _calculate_select_structure(vector, log2, b):
         for i in range(len(relativeOffsets) - 1):
            
             if (relativeOffsets[i + 1] - relativeOffsets[i]) > (log2 / 2):  
+                #print(chunkOffset)
+                #print(relativeOffsets[i + 1])
+                #print("------")
+                counter = 0
                 for i2 in range(relativeOffsets[i], relativeOffsets[i + 1]):
                     if vector[chunkOffset + i2] == b: # todo stopped working here
                         counter += 1
                         denseSparseLookup[
-                            (chunkOffsets.index(chunkOffset) * chunkWeight) 
+                            int((chunkOffsets.index(chunkOffset) * chunkWeight) 
                             + i * subChunkWeight
-                            + counter
-                        ] = chunkOffset + i2    
+                            + counter)
+                        ] = chunkOffset + i2  
+                        print("d-s-o: " + str((chunkOffsets.index(chunkOffset) * chunkWeight)) 
+                            + " - " + str(i * subChunkWeight)
+                            + " - " + str(counter))
             
             else: 
                 key = vector[chunkOffset + relativeOffsets[i] : chunkOffset + relativeOffsets[i + 1]]

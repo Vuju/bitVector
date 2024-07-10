@@ -6,7 +6,7 @@ from MyBitVector import MyBitVector
 
 start_time = time.time()
 
-inputFile = "input.txt"
+inputFile = "./src/input.txt"
 outputFile = "output.txt"
 
 try:
@@ -17,7 +17,7 @@ except IndexError:
 
 with open(inputFile) as f:
     cmdCount = int(f.readline())
-    bitVectorString = f.readline()
+    bitVectorString = f.readline().strip()
 
     bitVector = MyBitVector(bitVectorString)
 
