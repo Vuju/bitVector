@@ -3,16 +3,13 @@
 class myBitVector:
     def __init__(self, vectorAsString):
         self.len = len(vectorAsString)
-        self.vector = int(vectorAsString, 2)
+        self.vector = [char for char in vectorAsString]
 
     def access(self, index):
-        return (self.vector >> (self.len - 1 - index)) & 1
+        return self.vector[index]
 
-    def rank(self, index):
-        return bin(self.vector & ((1 << (index + 1)) - 1)).count("1")
+    def rank(self):
+        pass
 
-    def select(self, index):
-        return bin(self.vector & (((1 << (index + 1)) - 1) << (self.len - index - 1))).count("1")
-
-    def space(self):
-        return self.len
+    def select(self):
+        pass
