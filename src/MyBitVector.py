@@ -41,37 +41,37 @@ class MyBitVector:
     def select(self, args):
         [bitChar, elementString] = args.split(" ")
         
-        print("lets go:")
+        #print("lets go:")
         b = int(bitChar)
         element = int(elementString)        
-        print(self.chunkOffsets[b])
+        #print(self.chunkOffsets[b])
         
         chunkId = int(element / self.log2sq)
-        print(chunkId)
+        #print(chunkId)
         
         if (self.chunkOffsets[b][chunkId + 1] - self.chunkOffsets[b][chunkId]) > (self.log2 ** 4):
-            print("Sparse!")
+            #print("Sparse!")
             return self.sparseLookup[b][element]
         else: 
-            print("Dense")
+            #print("Dense")
             offset = self.chunkOffsets[b][chunkId]
             subChunks = self.subChunkOffsets[b][offset]
-            print(self.subChunkOffsets[b])
+            #print(self.subChunkOffsets[b])
             remainder = (element - 1) % self.log2sq            
             subChunkId = int(remainder / int(self.log2 ** (1/2)))
-            print(str(subChunkId) + " = " + str(remainder) + " / " + str(self.log2 ** (1/2)))
+            #print(str(subChunkId) + " = " + str(remainder) + " / " + str(self.log2 ** (1/2)))
             relativeOffset = subChunks[subChunkId]
             if (subChunks[subChunkId + 1] - relativeOffset) > self.log2hf:
-                print("-> Sparse!")
-                print(self.denseSparseLookup[b])
+                #print("-> Sparse!")
+                #print(self.denseSparseLookup[b])
                 return self.denseSparseLookup[b][element]
             else:
-                print("-> Dense!")
-                print(self.denseDenseLookup[b])
-                print("Offset: " + str(offset) + ", relOff: " + str(relativeOffset))
+                #print("-> Dense!")
+                #print(self.denseDenseLookup[b])
+                #print("Offset: " + str(offset) + ", relOff: " + str(relativeOffset))
                 key = self.vector[offset + relativeOffset : offset + subChunks[subChunkId + 1]]
                 subSubIndex = (remainder % int(self.log2 ** (1/2)))
-                print(str(key) + ": " + str(subSubIndex))
+                #print(str(key) + ": " + str(subSubIndex))
                 return (offset + relativeOffset + self.denseDenseLookup[b][str(key)][subSubIndex])
 
 
@@ -156,9 +156,9 @@ def _calculate_select_structure(vector, log2, b):
                             + i * subChunkWeight
                             + counter)
                         ] = chunkOffset + i2  
-                        print("d-s-o: " + str((chunkOffsets.index(chunkOffset) * chunkWeight)) 
-                            + " - " + str(i * subChunkWeight)
-                            + " - " + str(counter))
+                        #print("d-s-o: " + str((chunkOffsets.index(chunkOffset) * chunkWeight)) 
+                            #+ " - " + str(i * subChunkWeight)
+                            #+ " - " + str(counter))
             
             else: 
                 key = vector[chunkOffset + relativeOffsets[i] : chunkOffset + relativeOffsets[i + 1]]
