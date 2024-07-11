@@ -15,7 +15,7 @@ class MyBitVector:
         self.log2 = (self.len.bit_length() - 1)
         self.log2sq = self.log2 ** 2
         self.log2hf = int(self.log2 / 2)
-        self.rankVector = _calculate_rank_super_block(self.vector, self.log2sq, self.log2hf)
+        self.rankVector, self.rankLookup = _calculate_rank_super_block(self.vector, self.log2sq, self.log2hf)
         
         self.chunkOffsets = [None, None]
         self.sparseLookup = [None, None]
@@ -32,7 +32,7 @@ class MyBitVector:
 
     def rank(self, args):
         [b, index] = [int(n) for n in args.split(" ")]
-        rankOf1 = self.rankVector[int(index / self.log2sq)].get_rank(index % self.log2sq)
+        rankOf1 = self.rankVector[int(index / self.log2sq)].get_rank(self.rankLookup, index % self.log2sq)
         if b == 1:
             return rankOf1
         else:
@@ -79,14 +79,14 @@ def _calculate_rank_super_block(vec, log2sq, log2hf):
     numSuperBlocks = int(len(vec) / log2sq) + 1  # optional todo: optimize if no rounding happens
     superBlocks = [None] * numSuperBlocks
     # print("Number and lenght of SB is: " + str(numSuperBlocks) + " and " + str(log2sq))
-
+    rankLookup = {}
     currentOffset = 0
     for i in range(numSuperBlocks):
-        superBlocks[i] = SuperBlock(vec[(i * log2sq): ((i + 1) * log2sq)], currentOffset, log2hf)
+        superBlocks[i] = SuperBlock(vec[(i * log2sq): ((i + 1) * log2sq)], currentOffset, log2hf, rankLookup)
         currentOffset = superBlocks[i].offset
         # print("Offset of SB " + str(i) + " is " + str(currentOffset))
 
-    return superBlocks
+    return superBlocks, rankLookup
 
 
 def _calculate_select_structure(vector, log2, b):
@@ -177,52 +177,42 @@ def _calculate_select_structure(vector, log2, b):
          
 
 class SuperBlock:
-    def __init__(self, vec, prevOffset, blockLen):
+    def __init__(self, vec, prevOffset, blockLen, rankLookup):
         self.vector = vec
         self.prevOffset = prevOffset
         self.blockLen = blockLen
         numBlocks = int(len(self.vector) / blockLen) + 1  # todo: check whether +1 is necessary, mby optimize
         self.blocks = [None] * numBlocks
-        self.rankLookup = {}
 
         currentOffset = 0
         for i in range(numBlocks):
-            self.blocks[i] = Block(vec[(i * blockLen): ((i + 1) * blockLen)], currentOffset)
+            self.blocks[i] = Block(vec[(i * blockLen): ((i + 1) * blockLen)], currentOffset, rankLookup)
             currentOffset = self.blocks[i].offset
             # print("Offset of Block " + str(i) + " is " + str(currentOffset))
         self.offset = prevOffset + currentOffset
 
-    def get_rank(self, index):
+    def get_rank(self, rankLookUp, index):
         blockIndex = int(index / self.blockLen)
         mod = index % self.blockLen
-        return self.prevOffset + self.blocks[blockIndex].get_rank(mod)
+        return self.prevOffset + self.blocks[blockIndex].get_rank(rankLookUp, mod)
 
 
 class Block:
-    def __init__(self, vec, prevOffset):
-        currentOffest = 0
-        self.lookup = [None] * len(vec)
-        for i in range(len(vec)):
-            if vec[i] == '1':
-                currentOffest += 1
-            self.lookup[i] = currentOffest
+    def __init__(self, vec, prevOffset, rankLookup):        
         self.prevOffset = prevOffset
-        self.offset = prevOffset + currentOffest
+        self.vec = vec
+        if vec not in rankLookup:
+            currentOffset = 0
+            tmplookup = [None] * len(vec)
+            for i in range(len(vec)):                
+                tmplookup[i] = currentOffset
+                if vec[i] == '1':
+                    currentOffset += 1
+            self.offset = prevOffset + currentOffset
+            rankLookup[vec] = tmplookup
+        else:
+            self.offset = prevOffset + rankLookup[vec][-1]
 
-    def get_rank(self, index):
-        return self.prevOffset + self.lookup[index]
+    def get_rank(self, rankLookup, index):
+        return self.prevOffset + rankLookup[self.vec][index]
 
-
-# copied singleton metaclass from: https://stackoverflow.com/a/6798042
-class Singleton(type):
-    _instances = {}
-    def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
-        return cls._instances[cls]
-
-class RankLookup(object):
-    __metaclass__ = Singleton
-    
-    def __init__(self) -> None:
-        self.table = {}
