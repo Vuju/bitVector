@@ -13,3 +13,7 @@ Default values for the paths are "./src/input.txt" and "./src/output.txt". The o
 Imports:
 - time: measure execution time
 - sys: grab commandline arguments (file paths)
+
+I tried implementing the data structures as explained in the following videos:
+- Jacobson's rank: https://www.youtube.com/watch?v=M1sUZxXVjG8
+- Clark's select: https://www.youtube.com/watch?v=_04wwUzqZCM

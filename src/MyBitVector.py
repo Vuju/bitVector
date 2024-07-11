@@ -202,17 +202,20 @@ class Block:
     def __init__(self, vec, prevOffset, rankLookup):        
         self.prevOffset = prevOffset
         self.vec = vec
-        if vec not in rankLookup:
-            currentOffset = 0
-            tmplookup = [None] * len(vec)
-            for i in range(len(vec)):         
-                if vec[i] == '1':
-                    currentOffset += 1                       
-                tmplookup[i] = currentOffset
-            self.offset = prevOffset + currentOffset
-            rankLookup[vec] = tmplookup
+        if not vec == '':
+            if vec not in rankLookup:
+                currentOffset = 0
+                tmplookup = [None] * len(vec)
+                for i in range(len(vec)):         
+                    if vec[i] == '1':
+                        currentOffset += 1                       
+                    tmplookup[i] = currentOffset
+                self.offset = prevOffset + currentOffset
+                rankLookup[vec] = tmplookup
+            else:
+                self.offset = prevOffset + rankLookup[vec][-1]
         else:
-            self.offset = prevOffset + rankLookup[vec][-1]
+            self.offset = prevOffset
 
     def get_rank(self, rankLookup, index):
         return self.prevOffset + rankLookup[self.vec][index]
