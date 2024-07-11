@@ -10,7 +10,7 @@ class MyBitVector:
 
     def __init__(self, vectorAsString):
         self.len = len(vectorAsString)
-        self.vector = [char for char in vectorAsString] # optional todo: dont store as char array
+        self.vector = vectorAsString
 
         self.log2 = (self.len.bit_length() - 1)
         self.log2sq = self.log2 ** 2
@@ -183,6 +183,7 @@ class SuperBlock:
         self.blockLen = blockLen
         numBlocks = int(len(self.vector) / blockLen) + 1  # todo: check whether +1 is necessary, mby optimize
         self.blocks = [None] * numBlocks
+        self.rankLookup = {}
 
         currentOffset = 0
         for i in range(numBlocks):
@@ -211,4 +212,17 @@ class Block:
     def get_rank(self, index):
         return self.prevOffset + self.lookup[index]
 
-    # todo create lookup storage to remove duplicates
+
+# copied singleton metaclass from: https://stackoverflow.com/a/6798042
+class Singleton(type):
+    _instances = {}
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]
+
+class RankLookup(object):
+    __metaclass__ = Singleton
+    
+    def __init__(self) -> None:
+        self.table = {}
