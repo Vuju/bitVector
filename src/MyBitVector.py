@@ -31,12 +31,13 @@ class MyBitVector:
         return self.vector[int(index)]
 
     def rank(self, args):
-        [b, index] = [int(n) for n in args.split(" ")]
+        [b, iindex] = [int(n) for n in args.split(" ")]
+        index = iindex - 1
         rankOf1 = self.rankVector[int(index / self.log2sq)].get_rank(self.rankLookup, index % self.log2sq)
         if b == 1:
             return rankOf1
         else:
-            return index - rankOf1
+            return iindex - rankOf1
 
     def select(self, args):
         [bitChar, elementString] = args.split(" ")
@@ -204,10 +205,10 @@ class Block:
         if vec not in rankLookup:
             currentOffset = 0
             tmplookup = [None] * len(vec)
-            for i in range(len(vec)):                
-                tmplookup[i] = currentOffset
+            for i in range(len(vec)):         
                 if vec[i] == '1':
-                    currentOffset += 1
+                    currentOffset += 1                       
+                tmplookup[i] = currentOffset
             self.offset = prevOffset + currentOffset
             rankLookup[vec] = tmplookup
         else:
