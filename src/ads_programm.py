@@ -2,12 +2,13 @@
 
 import time
 import sys
+
 from MyBitVector import MyBitVector
 
 start_time = time.time()
 
 inputFile = "./src/input.txt"
-outputFile = "output.txt"
+outputFile = "./src/output.txt"
 
 try:
     inputFile = sys.argv[1]
@@ -27,9 +28,13 @@ with open(inputFile) as f:
         "access": bitVector.access
     }
 
+    
+    
+    out = open(outputFile, 'w+')
     for line in f:
-        comm = line.strip().split(" ", 1)  # this only splits the command from the arguments,
-        print(ops[comm[0]](comm[1]))       # therefore this line passes all arguments as a single string!
+        comm = line.strip().split(" ", 1)           # this only splits the command from the arguments,
+        out.write(str(ops[comm[0]](comm[1])) + '\n')       # therefore this line passes all arguments as a single string!
+    out.close()
 
 print("RESULT name=julian_vu time={0} space={1}".format(int((time.time() - start_time) / 1000), "dunno"))
 
