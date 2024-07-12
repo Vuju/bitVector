@@ -8,7 +8,7 @@ Run with:
 python (path to ads_program.py) (path to inputfile) (path to outputfile)
 ```
 
-Default values for the paths are "./src/input.txt" and "./src/output.txt". The output file will be overwritten and automatically be created if it doesn't exist yet.
+Tested with Python 3.12.4 64-bit for Windows. Default values for the paths are "./src/input.txt" and "./src/output.txt". The output file will be overwritten and automatically be created if it doesn't exist yet.
 
 Contains the files
 - ads_programm.py : the main script to read, interpret and evaluate the input file according to the given specifications
