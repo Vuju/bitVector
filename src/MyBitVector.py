@@ -2,7 +2,7 @@
 from total_size import total_size
 
 class MyBitVector:
-    """A bit vector which implements (somewhat) efficient rank and select operations.
+    """A bit vector which implements efficient rank and select operations.
 
         Attributes:
             vectorAsString: A string of 0 and 1 to read a text file.
@@ -28,13 +28,13 @@ class MyBitVector:
 
     def space(self):
         space_req = (len(self.vector.encode('utf-8')) * 8)
-        space_req += total_size(self.rankVector)
-        space_req += total_size(self.rankLookup)
-        space_req += total_size(self.sparseLookup)
-        space_req += total_size(self.chunkOffsets)
-        space_req += total_size(self.subChunkOffsets)
-        space_req += total_size(self.denseSparseLookup)
-        space_req += total_size(self.denseDenseLookup)
+        space_req += total_size(self.rankVector) * 8
+        space_req += total_size(self.rankLookup) * 8
+        space_req += total_size(self.sparseLookup) * 8
+        space_req += total_size(self.chunkOffsets) * 8
+        space_req += total_size(self.subChunkOffsets) * 8
+        space_req += total_size(self.denseSparseLookup) * 8
+        space_req += total_size(self.denseDenseLookup) * 8
  
         return space_req
 
@@ -74,7 +74,7 @@ class MyBitVector:
 
 
 def _calculate_rank_super_block(vec, log2sq, log2hf):
-    numSuperBlocks = int(len(vec) / log2sq) + 1  # optional todo: optimize if no rounding happens
+    numSuperBlocks = int(len(vec) / log2sq) + 1
     superBlocks = [None] * numSuperBlocks
     rankLookup = {}
     currentOffset = 0
