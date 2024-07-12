@@ -44,7 +44,7 @@ class MyBitVector:
     def rank(self, args):
         [b, iindex] = [int(n) for n in args.split(" ")]
         index = iindex - 1
-        rankOf1 = self.rankVector[int(index / self.log2sq)].get_rank(self.rankLookup, index % self.log2sq)
+        rankOf1 = self.rankVector[int(index / self.log2sq)].get_rank(self.vector, self.rankLookup, index, self.log2sq)
         if b == 1:
             return rankOf1
         else:
@@ -168,10 +168,9 @@ def _calculate_select_structure(vector, log2, b):
 
 class SuperBlock:
     def __init__(self, vec, prevOffset, blockLen, rankLookup):
-        self.vector = vec
         self.prevOffset = prevOffset
         self.blockLen = blockLen
-        numBlocks = int(len(self.vector) / blockLen) + 1  # todo: check whether +1 is necessary, mby optimize
+        numBlocks = int(len(vec) / blockLen) + 1 
         self.blocks = [None] * numBlocks
 
         currentOffset = 0
@@ -180,16 +179,19 @@ class SuperBlock:
             currentOffset = self.blocks[i].offset
         self.offset = prevOffset + currentOffset
 
-    def get_rank(self, rankLookUp, index):
+    def get_rank(self, vector, rankLookUp, fullIndex, superBlockSize):
+        index = fullIndex % superBlockSize
         blockIndex = int(index / self.blockLen)
         mod = index % self.blockLen
-        return self.prevOffset + self.blocks[blockIndex].get_rank(rankLookUp, mod)
+        start = (int(fullIndex / superBlockSize) * superBlockSize) + (blockIndex * self.blockLen)
+        end = (int(fullIndex / superBlockSize) * superBlockSize) + ((blockIndex + 1) * self.blockLen)
+        vec = vector[start : end]
+        return self.prevOffset + self.blocks[blockIndex].get_rank() + rankLookUp[vec][mod]
 
 
 class Block:
     def __init__(self, vec, prevOffset, rankLookup):        
         self.prevOffset = prevOffset
-        self.vec = vec
         if not vec == '':
             if vec not in rankLookup:
                 currentOffset = 0
@@ -205,6 +207,6 @@ class Block:
         else:
             self.offset = prevOffset
 
-    def get_rank(self, rankLookup, index):
-        return self.prevOffset + rankLookup[self.vec][index]
+    def get_rank(self):
+        return self.prevOffset
 
